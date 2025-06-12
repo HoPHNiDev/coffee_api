@@ -3,11 +3,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
+from routes.v1 import APIv1
 
 
 def create_application() -> FastAPI:
     """
-    Создает и настраивает экземпляр приложения FastAPI.
+    Create and configure FastAPI app
     """
     app = FastAPI(**settings.app_params)
 
@@ -18,6 +19,10 @@ def create_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    v1_router = APIv1()
+    v1_router.configure_routes()
+    app.include_router(v1_router.get_router(), prefix="/api/v1")
 
     return app
 

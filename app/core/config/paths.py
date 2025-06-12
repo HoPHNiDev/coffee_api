@@ -19,12 +19,24 @@ class PathSettings:
         )
         return current_dir
 
+    @staticmethod
+    def check_and_create_directory(path: Path) -> None:
+        """Check if the directory exists, if not, create it."""
+        if not path.exists():
+            path.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Created directory: {path}")
+        else:
+            logger.info(f"Directory already exists: {path}")
+
 
     BASE_DIR = find_project_root()
 
     APP_DIR = BASE_DIR / "app"
-    CORE_DIR = BASE_DIR / "core"
+    CORE_DIR = APP_DIR / "core"
     ENV_FILE = APP_DIR / ".env"
 
-    PUBLIC_KEY_PATH = CORE_DIR /"keys" / "jwt-public.pem"
-    PRIVATE_KEY_PATH = CORE_DIR / "keys" / "jwt-private.pem"
+    KEY_DIR = CORE_DIR / "keys"
+    check_and_create_directory(KEY_DIR)
+
+    PUBLIC_KEY_PATH = KEY_DIR / "jwt-public.pem"
+    PRIVATE_KEY_PATH = KEY_DIR / "jwt-private.pem"

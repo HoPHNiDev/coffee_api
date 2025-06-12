@@ -1,7 +1,7 @@
 from loguru import logger
 from pathlib import Path
 
-from pydantic import PrivateAttr
+from pydantic import PrivateAttr, BaseModel
 from pydantic_settings import BaseSettings
 from typing import AsyncGenerator
 
@@ -59,6 +59,14 @@ class DataBase(BaseSettings):
 
     model_config = dict(extra="ignore")
 
+class AuthJWT(BaseModel):
+    PRIVATE_KEY: Path = PathSettings.PRIVATE_KEY_PATH
+    PUBLIC_KEY: Path = PathSettings.PUBLIC_KEY_PATH
+    ALGORITHM: str = "RS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 1
+
+
 class Settings(BaseSettings, Singleton):
     TITLE: str = "Coffee API"
     DESCRIPTION: str = ""
@@ -97,6 +105,7 @@ class Settings(BaseSettings, Singleton):
     _db: DataBase = PrivateAttr()
     _db_helper: DatabaseHelper = PrivateAttr()
     _paths: PathSettings = PrivateAttr()
+    _auth_jwt: AuthJWT = PrivateAttr()
 
     def __init__(self, env_file: str | Path | None = None):
         super().__init__(_env_file=env_file)
@@ -108,6 +117,7 @@ class Settings(BaseSettings, Singleton):
         )
 
         self._paths: PathSettings = PathSettings()
+        self._auth_jwt: AuthJWT = AuthJWT()
 
 
     @property
@@ -121,3 +131,7 @@ class Settings(BaseSettings, Singleton):
     @property
     def paths(self) -> PathSettings:
         return self._paths
+
+    @property
+    def auth_jwt(self) -> AuthJWT:
+        return self._auth_jwt

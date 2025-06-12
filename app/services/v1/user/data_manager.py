@@ -24,6 +24,12 @@ class UserDataManager:
         return user
 
     @classmethod
+    async def get_users(cls, uow: IUnitOfWork, offset: int = 0, limit: int = 10):
+        stmt = uow.user.select().order_by(uow.user.model.id).limit(limit).offset(offset)
+        users = await uow.user.find_all(stmt=stmt)
+        return users
+
+    @classmethod
     async def create(cls, uow: IUnitOfWork, data: User) -> User:
         user = await uow.user.add_one(data=data)
         await uow.session.commit()

@@ -1,6 +1,13 @@
 from pydantic import Field, ConfigDict
 
 from models.v1.user import UserRole, UserBase
+from schemas.v1.base import BaseRequestSchema
+
+
+class UserUpdateRequestSchema(BaseRequestSchema):
+    username: str = Field(
+        description="New username of the user", min_length=3, max_length=50
+    )
 
 
 class UserSchema(UserBase):

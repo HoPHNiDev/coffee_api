@@ -5,9 +5,10 @@ from core.exceptions import (
     TokenError,
     TokenInvalidError,
     TokenMissingError,
+    AuthRequiredError,
+    ForbiddenError
 )
 from core.di import DUoW
-from core.exceptions.user import AuthRequiredError, ForbiddenError
 from core.security.cookies import CookieManager
 from core.security.token import TokenManager
 from models import User

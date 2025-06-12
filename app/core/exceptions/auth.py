@@ -62,6 +62,29 @@ class InvalidCredentialsError(AuthenticationError):
         )
 
 
+
+class InvalidPasswordError(AuthenticationError):
+    """
+    Exception for invalid password.
+
+    Raised when a user provides a correct identifier,
+    but an incorrect password during authentication.
+
+    Attributes:
+        detail (str): "Invalid password".
+        error_type (str): "invalid_password".
+    """
+
+    def __init__(self):
+        """
+        Initializes InvalidPasswordError with predefined values.
+        """
+        super().__init__(
+            detail="Invalid password",
+            error_type="invalid_password",
+        )
+
+
 class TokenError(AuthenticationError):
     """
     Base class for all authentication token errors.

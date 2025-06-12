@@ -30,10 +30,10 @@ class PathSettings:
 
 
     BASE_DIR = find_project_root()
+    ENV_FILE = BASE_DIR / ".env"
 
     APP_DIR = BASE_DIR / "app"
     CORE_DIR = APP_DIR / "core"
-    ENV_FILE = APP_DIR / ".env"
 
     KEY_DIR = CORE_DIR / "keys"
     check_and_create_directory(KEY_DIR)

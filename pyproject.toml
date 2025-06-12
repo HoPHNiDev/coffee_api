@@ -12,6 +12,8 @@ dependencies = [
     "greenlet>=3.2.3",
     "loguru>=0.7.3",
     "pydantic-settings>=2.9.1",
+    "python-jose[cryptography]>=3.5.0",
+    "pytz>=2025.2",
     "sqlmodel>=0.0.24",
     "uvicorn>=0.34.3",
 ]

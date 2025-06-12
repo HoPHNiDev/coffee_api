@@ -63,8 +63,9 @@ class AuthJWT(BaseModel):
     PRIVATE_KEY: Path = PathSettings.PRIVATE_KEY_PATH
     PUBLIC_KEY: Path = PathSettings.PUBLIC_KEY_PATH
     ALGORITHM: str = "RS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 1
+    VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 2 * 24 * 60  # 2 days in minutes
 
 
 class Settings(BaseSettings, Singleton):
@@ -98,6 +99,29 @@ class Settings(BaseSettings, Singleton):
     COOKIE_DOMAIN: str | None = None
     COOKIE_SECURE: bool = True
     COOKIE_SAMESITE: str = "None"
+
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int = 587,
+    MAIL_SERVER: str = "smtp.gmail.com"
+    MAIL_FROM_NAME: str = "Coffee Shop Mailer"
+
+    @property
+    def mail_params(self) -> dict:
+        return {
+            "MAIL_USERNAME": self.MAIL_USERNAME,
+            "MAIL_PASSWORD": self.MAIL_PASSWORD,
+            "MAIL_FROM": self.MAIL_FROM,
+            "MAIL_PORT": self.MAIL_PORT,
+            "MAIL_SERVER": self.MAIL_SERVER,
+            "MAIL_FROM_NAME": self.MAIL_FROM_NAME,
+            "MAIL_STARTTLS": True,
+            "MAIL_SSL_TLS": False,
+            "USE_CREDENTIALS": True,
+            "VALIDATE_CERTS": True,
+            "TEMPLATE_FOLDER": PathSettings.EMAIL_TEMPLATES_DIR,
+        }
 
     CORS_ORIGINS: list[str] = [
         "http://localhost:8000",

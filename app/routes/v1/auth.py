@@ -15,7 +15,7 @@ Classes:
     AuthRouter: Class for configuring authentication routes
 """
 
-from fastapi import Header, Response, Cookie
+from fastapi import Header, Response, Cookie, BackgroundTasks
 from core.exceptions import TokenMissingError
 from core.di import DUoW
 from core.exceptions.user import AuthRequiredError
@@ -102,7 +102,7 @@ class AuthRouter(BaseRouter):
             },
         )
         async def register(
-            uow: DUoW, form_data: RegistrationRequestSchema
+            uow: DUoW, bg_tasks: BackgroundTasks ,form_data: RegistrationRequestSchema
         ) -> BaseResponseSchema:
             """
             ## 🔐 Registration of a new user
@@ -118,6 +118,7 @@ class AuthRouter(BaseRouter):
             """
             return await AuthService.register(
                 uow=uow,
+                bg_tasks=bg_tasks,
                 form_data=form_data,
             )
 
@@ -246,4 +247,60 @@ class AuthRouter(BaseRouter):
                 response=response,
                 access_token=token,
                 use_cookies=use_cookies,
+            )
+        async def verify(uow: DUoW, token: str) -> BaseResponseSchema:
+            """
+            ## 📨 Email Verification
+
+            Verifies the user's email address using a verification token.
+
+            ### Headers:
+            * **verification_token**: Verification token received during registration
+
+            ### Returns:
+            * **success**: Boolean indicating whether the logout was successful
+            * **message**: Message confirming successful logout
+            """
+
+            return await AuthService.verify(
+                uow=uow,
+                verification_token=token,
+            )
+
+        @self.router.get(
+            path="/verify",
+            response_model=BaseResponseSchema,
+            summary="Verify email",
+            responses={
+                200: {
+                    "model": BaseResponseSchema,
+                    "description": "Successful email verification",
+                },
+                401: {
+                    "model": TokenMissingResponseSchema,
+                    "description": "Verification token is missing",
+                },
+                422: {
+                    "model": TokenInvalidResponseSchema,
+                    "description": "Invalid verification token",
+                },
+            },
+        )
+        async def verify(uow: DUoW, token: str) -> BaseResponseSchema:
+            """
+            ## 📨 Email Verification
+
+            Verifies the user's email address using a verification token.
+
+            ### Parameters:
+            * **verification_token**: Verification token received during registration
+
+            ### Returns:
+            * **success**: Boolean indicating whether the logout was successful
+            * **message**: Message confirming successful logout
+            """
+
+            return await AuthService.verify(
+                uow=uow,
+                verification_token=token,
             )

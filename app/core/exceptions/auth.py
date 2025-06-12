@@ -182,3 +182,24 @@ class TokenInvalidError(TokenError):
         super().__init__(
             detail=detail, error_type="token_invalid", status_code=422, extra=extra
         )
+
+class EmailSendError(AuthenticationError):
+    """
+    Exception for errors during email sending.
+
+    Raised when there is an issue with sending an email,
+    such as SMTP errors or connection issues.
+
+    Attributes:
+        detail (str): "Failed to send email".
+        error_type (str): "email_send_error".
+    """
+
+    def __init__(self):
+        """
+        Initializes EmailSendError with predefined values.
+        """
+        super().__init__(
+            detail="Failed to send email",
+            error_type="email_send_error",
+        )

@@ -6,6 +6,7 @@ from .auth import (
     TokenExpiredError,
     TokenInvalidError,
     TokenMissingError,
+    EmailSendError
 )
 from .base import BaseAPIException
 
@@ -20,6 +21,7 @@ __all__ = [
     "TokenExpiredError",
     "TokenInvalidError",
     "TokenMissingError",
+    "EmailSendError",
 
     "ForbiddenError",
     "AuthRequiredError",

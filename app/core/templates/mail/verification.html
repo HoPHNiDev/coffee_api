@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% block title %}Подтверждение email{% endblock title %}
+{% block header_title %}Email address verification{% endblock header_title %}
+{% block content %}
+<p>Hello, {{ username }}!</p>
+<p>To complete the registration, you must confirm your email address.</p>
+<p>
+  <a href="{{ verification_url }}" class="button">Confirm email</a>
+</p>
+<p>Or follow the link:</p>
+<p>{{ verification_url }}</p>
+<p>
+  If you have not registered on our website, just ignore this email.
+</p>
+{% endblock content %}

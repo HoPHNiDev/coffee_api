@@ -125,6 +125,27 @@ class TokenManager:
 
         return session_id
 
+
+    @staticmethod
+    def create_verification_payload(user_id: int) -> dict:
+        return {
+            "sub": str(user_id),
+            "expires_at": int(
+                (datetime.now() + timedelta(minutes=settings.auth_jwt.VERIFICATION_TOKEN_EXPIRE_MINUTES)).timestamp()
+            ),
+            "type": "verification",
+        }
+
+    @staticmethod
+    def validate_verification_token(payload: dict) -> int:
+        TokenManager.validate_token_payload(payload, "verification")
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise TokenInvalidError("Missed user_id in verification token payload")
+
+        return int(user_id)
+
     @staticmethod
     def get_token_from_header(
         authorization: str = Header(
@@ -163,5 +184,13 @@ class TokenManager:
         payload = TokenManager.create_refresh_payload(session_schema)
 
         logger.debug(f"Created refresh token for user ID: {session_schema.user_id}")
+
+        return TokenManager.generate_token(payload)
+
+    @staticmethod
+    def create_verification_token(user_id: int) -> str:
+        payload = TokenManager.create_verification_payload(user_id=user_id)
+
+        logger.debug(f"Created verification token for user ID: {user_id}")
 
         return TokenManager.generate_token(payload)

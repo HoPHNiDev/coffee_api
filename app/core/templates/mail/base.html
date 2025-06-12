@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+  {% include 'head.html' %}
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>{% block header_title %}Coffee Shop{% endblock header_title %}</h1>
+      </div>
+      <div class="content">{% block content %}{% endblock content %}</div>
+      <div class="footer">
+        {% block footer %}
+        <p>This is an automatic email, do not reply to it.</p>
+        <p>© 2025 Coffee API. All rights reserved.</p>
+        {% endblock footer %}
+      </div>
+    </div>
+  </body>
+</html>

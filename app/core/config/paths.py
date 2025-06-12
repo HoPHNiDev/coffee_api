@@ -35,6 +35,9 @@ class PathSettings:
     APP_DIR = BASE_DIR / "app"
     CORE_DIR = APP_DIR / "core"
 
+    TEMPLATES_DIR = CORE_DIR / "templates"
+    EMAIL_TEMPLATES_DIR = TEMPLATES_DIR / "mail"
+
     KEY_DIR = CORE_DIR / "keys"
     check_and_create_directory(KEY_DIR)
 

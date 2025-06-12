@@ -132,7 +132,7 @@ class UserRouter(BaseRouter):
         @self.router.get(
             path="/{id}",
             response_model=UserSchema,
-            summary="Get user information by ID (admin only)",
+            summary="Get user information by ID",
             responses={
                 200: {
                     "model": UserSchema,
@@ -154,13 +154,13 @@ class UserRouter(BaseRouter):
         )
         async def get_user(
             uow: DUoW,
-            user: DUserAdmin,
+            user: DUser,
             user_id: int,
         ) -> UserSchema:
             """
-            ## Get User Information by ID (Admin Only)
+            ## Get User Information by ID
 
-            Retrieves information about a user by their ID. Only accessible to administrators.
+            Retrieves information about a user by their ID
 
             ### Parameters:
             - **user_id** (int): The ID of the user to retrieve.

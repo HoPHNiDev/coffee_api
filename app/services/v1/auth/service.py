@@ -1,9 +1,11 @@
 from enum import Enum
 from typing import Optional
 
-from fastapi import Response
+from fastapi import Response, BackgroundTasks
+from pydantic import EmailStr
 from loguru import logger
 
+from core.config import settings
 from core.exceptions import (
     InvalidPasswordError,
     TokenExpiredError,
@@ -14,6 +16,7 @@ from core.exceptions import (
     UserNotFoundError,
     UserExistsError
 )
+from core.integrations.mail.auth import MailAuthService
 from core.security.cookies import CookieManager
 from core.security.token import TokenManager
 from core.di import DUoW
@@ -42,6 +45,7 @@ class AuthService:
     async def register(
         cls,
         uow: DUoW,
+        bg_tasks: BackgroundTasks,
         form_data: RegistrationRequestSchema,
     ) -> BaseResponseSchema:
         """
@@ -60,6 +64,13 @@ class AuthService:
             raise UserExistsError(field=field, value=getattr(form_data, field))
 
         user = await UserDataManager.create_user(uow=uow, form_data=form_data)
+
+        bg_tasks.add_task(
+            cls.send_verification_email,
+            user_id=user.id,
+            email=form_data.email,
+            username=user.username,
+        )
 
         logger.info(f"User {user.username} registered successfully")
 
@@ -96,6 +107,13 @@ class AuthService:
                 extra={"identifier": identifier},
             )
 
+        if not user.is_verified:
+            logger.warning(f"User {identifier} not verified")
+            raise ForbiddenError(
+                detail="Account not verified. Verify it using link sent to your email.",
+                extra={"identifier": identifier},
+            )
+
         if not user.verify_password(credentials.password):
             logger.warning(f"Invalid password for user {identifier}")
             raise InvalidPasswordError()
@@ -113,6 +131,56 @@ class AuthService:
             use_cookies=use_cookies,
             action=TokenResponseAction.LOGIN,
         )
+
+    @classmethod
+    async def verify(
+        cls,
+        uow: DUoW,
+        verification_token: str,
+    ):
+        """
+        Verify user by verification token.
+
+        Args:
+            uow: Unit of Work with DB
+            verification_token: Verification token
+
+        Returns:
+            BaseResponseSchema: Response with success message
+
+        Raises:
+            TokenInvalidError: if verification token is invalid
+            TokenExpiredError: if verification token is expired
+            UserNotFoundError: if user not found
+        """
+        try:
+            payload = TokenManager.decode_token(verification_token)
+
+            user_id = TokenManager.validate_verification_token(payload)
+
+            user = await UserDataManager.get_user(uow=uow, id=user_id)
+
+            if not user:
+                logger.warning(f"User with id {user_id} not found")
+                raise UserNotFoundError(field="id", value=user_id)
+
+            if user.is_verified:
+                logger.warning(f"User {user.username} is already verified")
+                return BaseResponseSchema(
+                    message=f"User {user.username} is already verified",
+                )
+
+            user.is_verified = True
+            await UserDataManager.update(uow=uow, data=user)
+
+            return BaseResponseSchema(
+                message=f"User {user.username} verified successfully",
+            )
+
+        except (TokenExpiredError, TokenInvalidError) as e:
+            logger.warning(f"Verification failed: {e}")
+            logger.exception(e)
+            raise
 
     @classmethod
     async def refresh_token(
@@ -267,3 +335,36 @@ class AuthService:
         )
 
         return refresh_token
+
+    @staticmethod
+    async def send_verification_email(
+            user_id: int,
+            username: str,
+            email: EmailStr,
+    ):
+        """
+        Send verification email to user.
+
+        Args:
+            email: Email address to send verification link
+            username: Username of receiver
+            user_id: ID of user to send verification email
+
+        Returns:
+            BaseResponseSchema: Response with success message
+
+        Raises:
+            UserNotFoundError: if user not found
+        """
+        token = TokenManager.create_verification_token(user_id=user_id)
+
+        domain = settings.DOMAIN or f"http://{settings.HOST}:{settings.PORT}"
+        verification_url = f"{domain}/api/v1/auth/verify?token={token}"
+
+        return await MailAuthService.send_verification_message(
+            recipients=[email],
+            template_body={
+                "username": username,
+                "verification_url": verification_url,
+            },
+        )

@@ -23,4 +23,8 @@ class PathSettings:
     BASE_DIR = find_project_root()
 
     APP_DIR = BASE_DIR / "app"
+    CORE_DIR = BASE_DIR / "core"
     ENV_FILE = APP_DIR / ".env"
+
+    PUBLIC_KEY_PATH = CORE_DIR /"keys" / "jwt-public.pem"
+    PRIVATE_KEY_PATH = CORE_DIR / "keys" / "jwt-private.pem"

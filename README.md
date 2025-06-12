@@ -1,7 +1,9 @@
+# ✅ Implementation of the Coffee Shop API technical assignment
+
 ## ER-Diagram of DB
 ![img.png](img.png)
 
-## How to run the project
+## ℹ️ How to run the project
 
 ### Installing
 
@@ -23,6 +25,10 @@ uv sync
 openssl genpkey -algorithm RSA -out app/core/keys/jwt-private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -pubout -in app/core/keys/jwt-private.pem -out app/core/keys/jwt-public.pem
 ```
+5. Run the migrations:
+```shell
+alembic upgrade head
+```
 
 ### Running the project
 ```shell
@@ -40,6 +46,7 @@ It can be implemented via Celery or via message brokers
 It’s already 1 AM and I’m getting sleepy… otherwise, I’d have implemented this feature too. 
 
 ### Project structure
+#### You can check the structure of this project in this [**file**](STRUCTURE.md).
 The way I see the structure of the project, I think it is obvious from the structure of the code of this repository.
 
 ## ✍️ Questions? Pm me

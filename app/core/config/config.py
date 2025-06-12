@@ -95,6 +95,10 @@ class Settings(BaseSettings, Singleton):
             "reload": True,
         }
 
+    COOKIE_DOMAIN: str | None = None
+    COOKIE_SECURE: bool = True
+    COOKIE_SAMESITE: str = "None"
+
     CORS_ORIGINS: list[str] = [
         "http://localhost:8000",
         "http://127.0.0.1:8000",

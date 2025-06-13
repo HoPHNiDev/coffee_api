@@ -22,6 +22,7 @@ uv sync
 3. Fulfill the `.env-example` environment variables'
 4. Generate JWT public and private keys:
 ```shell
+mkdir app/core/keys
 openssl genpkey -algorithm RSA -out app/core/keys/jwt-private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -pubout -in app/core/keys/jwt-private.pem -out app/core/keys/jwt-public.pem
 ```
